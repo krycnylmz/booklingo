@@ -1,5 +1,5 @@
 # BookLingo – RAG-Based English Reading Assistant
-[Click for demo](https://www.booklingo.koraydev.com)
+[Click for demo](https://booklingo.koraydev.com/)
 ## Project Summary  
 **BookLingo** is an English learning assistant developed as part of the Akbank GenAI Bootcamp,  
 based on **Retrieval-Augmented Generation (RAG)**.  
