@@ -45,3 +45,6 @@ htmlcov/
 .pytest_cache/
 coverage.xml
 *.cover 
+
+book_db/
+data/
