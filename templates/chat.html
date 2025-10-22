@@ -27,7 +27,7 @@
           </ul>
           <p><i>Örnek:</i> <code>dismantling my engine</code> veya <code>intrigued</code></p>
         </div>
-        <div id="typing" class="typing" style="display:none;">🤖 Bot yazıyor...</div>
+        <div id="typing">🤖 Bot yazıyor...</div>
       </div>
 
       <div id="input-box">
@@ -70,7 +70,8 @@
 
       appendMessage('user', query);
       input.value = '';
-      input.disabled = true; sendBtn.disabled = true; typing.style.display = 'block';
+      input.disabled = true; sendBtn.disabled = true;
+      typing.style.display = 'block'; 
 
       try {
         const res = await fetch('/chat', {
@@ -82,7 +83,8 @@
       } catch (e) {
         appendMessage('bot', '⚠️ Sunucuya bağlanılamadı.');
       } finally {
-        typing.style.display = 'none'; input.disabled = false; sendBtn.disabled = false; input.focus();
+        typing.style.display = 'none'; 
+        input.disabled = false; sendBtn.disabled = false; input.focus();
       }
     }
 
@@ -91,7 +93,8 @@
       div.className = `msg ${sender}`;
       const formatted = sender === 'bot' ? marked.parse(text) : text;
       div.innerHTML = `${formatted}`;
-      messages.appendChild(div);
+      
+      messages.insertBefore(div, typing);
       messages.scrollTop = messages.scrollHeight;
     }
 
@@ -153,5 +156,6 @@
     }
   </script>
 </body>
+</html>
 
 </html>

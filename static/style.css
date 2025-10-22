@@ -14,7 +14,7 @@ body {
 }
 
 #wrap {
-    width: 880px;
+    width: 980px;
     display: grid;
     grid-template-columns: 1fr 320px;
     gap: 16px;
@@ -35,21 +35,33 @@ h2 {
     color: #333
 }
 
-#messages {
-    flex: 1;
-    overflow: auto;
-    padding: 1rem;
-    border-radius: 8px;
-    background: #fafafa;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .05);
-}
+    #messages {
+      position: relative;
+      overflow-y: auto;
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #typing {
+      position: sticky;
+      bottom: 0;
+      background: #fafafa;
+      padding: 6px 10px;
+      font-style: italic;
+      color: gray;
+      border-top: 1px solid #eee;
+      display: none;
+      text-align: left;
+      width: 20%;
+    }
 
 .msg {
     margin: .75rem 0;
     padding: .6rem .9rem;
     border-radius: 10px;
     width: fit-content;
-    max-width: 75%;
+    max-width: 95%;
     word-wrap: break-word;
     animation: fadeIn .3s ease-in-out;
 }
