@@ -68,7 +68,7 @@ pip install -r requirements.txt
 ```
 3. Run on terminal to set your environments
 ```
-mov .env.example
+mv .env.example .env
 # Then write your own GEMINI_API_KEY
 ```
 4. Run the app
