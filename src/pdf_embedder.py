@@ -9,8 +9,8 @@ from dotenv import load_dotenv
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-CHROMA_PATH = "book_db"
-chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
+CHROMA_PATH = ":memory:"
+chroma_client = chromadb.EphemeralClient() if CHROMA_PATH == ":memory:" else chromadb.PersistentClient(path=CHROMA_PATH)
 collection = chroma_client.get_or_create_collection("book_knowledge")
 
 embedding_model = os.getenv("EMBEDDING_MODEL", "models/text-embedding-004")
