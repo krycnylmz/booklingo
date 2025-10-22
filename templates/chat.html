@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>BookLingo Chatbot</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="../static/style.css" />
+</head>
+
+<body>
+  <div id="wrap">
+    <div id="chat">
+      <h2>BookLingo</h2>
+
+      <div id="messages">
+        <div class="intro">
+          <h3>📖 BookLingo'ya Hoş Geldiniz!</h3>
+          <p>
+            Bu uygulama, yüklediğiniz İngilizce kitaplardan kelime veya kalıpların
+            anlamlarını bulur ve kitapta geçtiği örnek cümlelerle açıklar.
+          </p>
+          <ul>
+            <li>📘 Sağ taraftan bir <b>Pdf yükleyin</b>.</li>
+            <li>💬 Ardından, chat kutusuna bilmediğiniz kelimeyi yazın.</li>
+            <li>🤖 BookLingo, kitapta o kelimenin geçtiği örnekleri gösterecek.</li>
+          </ul>
+          <p><i>Örnek:</i> <code>dismantling my engine</code> veya <code>intrigued</code></p>
+        </div>
+        <div id="typing" class="typing" style="display:none;">🤖 Bot yazıyor...</div>
+      </div>
+
+      <div id="input-box">
+        <input id="input" placeholder="Mesajınızı yazın..." autofocus />
+        <button id="sendBtn" onclick="send()">Gönder</button>
+      </div>
+    </div>
+
+    <div id="side">
+      <h3>PDF Yükle</h3>
+      <div id="drop" class="drop">
+        Dosyayı buraya sürükle-bırak <br />
+        <small>ya da</small><br />
+        <input id="file" type="file" accept="application/pdf" multiple />
+      </div>
+      <button id="uploadBtn">Yükle</button>
+      <small>Yüklenen PDF’ler otomatik olarak chunk’lanır, embed edilir ve DB’ye eklenir.</small>
+      <h4>Günlük</h4>
+      <div id="uploadLog"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages');
+    const typing = document.getElementById('typing');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Enter ile gönder
+    input.addEventListener("keypress", e => { if (e.key === "Enter") send(); });
+
+    async function send() {
+      const query = input.value.trim();
+      if (!query) return;
+
+      // İlk mesajda intro'yu kaldır
+      const intro = document.querySelector('.intro');
+      if (intro) intro.remove();
+
+      appendMessage('user', query);
+      input.value = '';
+      input.disabled = true; sendBtn.disabled = true; typing.style.display = 'block';
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        appendMessage('bot', data.response || 'Bir hata oluştu.');
+      } catch (e) {
+        appendMessage('bot', '⚠️ Sunucuya bağlanılamadı.');
+      } finally {
+        typing.style.display = 'none'; input.disabled = false; sendBtn.disabled = false; input.focus();
+      }
+    }
+
+    function appendMessage(sender, text) {
+      const div = document.createElement('div');
+      div.className = `msg ${sender}`;
+      const formatted = sender === 'bot' ? marked.parse(text) : text;
+      div.innerHTML = `${formatted}`;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    // ── Upload UI ─────────────────────────────────────────────────────────────
+    const fileInput = document.getElementById('file');
+    const drop = document.getElementById('drop');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadLog = document.getElementById('uploadLog');
+
+    ;['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); drop.classList.add('drag'); }));
+    ;['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e => { fileInput.files = e.dataTransfer.files; });
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!fileInput.files.length) { log('⚠️ Lütfen PDF seçin.'); return; }
+
+      uploadBtn.disabled = true;
+      const originalText = uploadBtn.textContent;
+      uploadBtn.textContent = "⏳ Yükleniyor...";
+      log("PDF yükleme ve embedding işlemi başlatıldı...");
+
+      try {
+        const fd = new FormData();
+        for (const f of fileInput.files) fd.append('files', f);
+        const res = await fetch('/upload', { method: 'POST', body: fd });
+
+        if (!res.ok) {
+          log(`❌ Sunucu hatası: ${res.status}`);
+          return;
+        }
+
+        const data = await res.json();
+        if (!data.ok) { log('❌ Yükleme başarısız.'); return; }
+
+        log(`✅ <b>Model:</b> <code>${data.model}</code>`);
+        data.results.forEach(r => {
+          log(`📘 <b>${escapeHtml(r.file)}</b> → chunks: ${r.chunks}, added: ${r.added}, collection: ${r.collection}`);
+        });
+
+        log("🎉 İşlem tamamlandı!");
+      } catch (e) {
+        console.error(e);
+        log('❌ Sunucu hatası / bağlantı sorunu.');
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = originalText;
+      }
+    });
+
+    function log(html) {
+      const p = document.createElement('div');
+      p.innerHTML = html;
+      uploadLog.appendChild(p);
+      uploadLog.scrollTop = uploadLog.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
+    }
+  </script>
+</body>
+
+</html>

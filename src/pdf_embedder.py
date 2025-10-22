@@ -26,7 +26,10 @@ def embed_pdf(pdf_path):
     chunks = splitter.split_text(text)
     print(f"📚 {len(chunks)} created text chunk")
 
-    for i, chunk in enumerate(chunks[:100]):  # store first 100 chunks for demo you can change it
+    # # store first 100 chunks for demo you can change it
+    limit = 100
+    stored = 0
+    for i, chunk in enumerate(chunks[:limit]):  # store first 100 chunks for demo you can change it
         emb = genai.embed_content(model=embedding_model, content=chunk)["embedding"]
         collection.add(
             ids=[f"chunk_{i}"],
@@ -34,7 +37,16 @@ def embed_pdf(pdf_path):
             documents=[chunk],
             metadatas=[{"source": os.path.basename(pdf_path), "page": i}]
         )
+        stored += 1
+
     print("✅ Embedding and storage complete.")
+
+    return {
+        "file": os.path.basename(pdf_path),
+        "chunks": len(chunks),
+        "added": stored,
+        "collection": "book_knowledge"
+    }
 
 # ── main
 if __name__ == "__main__":
