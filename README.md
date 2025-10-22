@@ -55,7 +55,7 @@ With this method, each user creates their own “mini vector database.”
 # Setup
 1. Clone this repo
 ```
-git clone this booklingo
+git clone https://github.com/krycnylmz/booklingo.git
 cd booklingo
 ```
 2. Create virtual environment 
@@ -69,7 +69,7 @@ pip install -r requirements.txt
 3. Run on terminal to set your environments
 ```
 mov .env.example
-# Then write your own environments
+# Then write your own GEMINI_API_KEY
 ```
 4. Run the app
 ```
