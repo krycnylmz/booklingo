@@ -91,15 +91,25 @@ def chat_query():
 
     # Create prompt for Gemini
     prompt = f"""
-Kullanıcı kitapta geçen '{query}' kelimesi veya kalıbının anlamını öğrenmek istiyor.
-
-=== GÖREV ===
-1. '{query}' kelimesinin anlamını kısaca Türkçe açıkla.
-2. Aşağıdaki bağlam parçalarından bu kelimenin geçtiği veya benzer kullanımların olduğu cümleleri en fazla 2 örnek olarak göster.
-3. İngilizce örnekleri koru, ancak yanında kısa Türkçe açıklama ekle.
+Kullanıcı, kitapta geçen "{query}" ifadesinin anlamını sordu.
 
 === BAĞLAM ===
 {context}
+
+=== GÖREV ===
+1. "{query}" ifadesinin anlamını sade ve anlaşılır bir Türkçe ile açıkla.
+   - Kısa, net ve doğal bir açıklama yap.
+   - Kelime kelime çeviri yapma; anlatılmak istenen duyguyu ya da durumu açıkla.
+2. Bu cümlede yazarın neyi kastettiğini ve bağlamı kısaca açıkla.
+3. Cevabını Türkçe yaz. İngilizce örnekleri orijinal haliyle koru.
+4. Yanıtın aşağıdaki örnek formatta olmalı:
+
+=== ÖRNEK ÇIKTI ===
+**Anlamı:** "Disheartened by the failure" ifadesi, bir başarısızlık yüzünden cesareti kırılmış, umudu azalmış veya hayal kırıklığına uğramış olmak anlamına gelir.
+
+**Kitaptaki Kullanımı:**
+"I had been disheartened by the failure of my Drawing Number One and my Drawing Number Two."
+→ Burada yazar, yaptığı iki çizimin başarısız olmasından dolayı moralinin bozulduğunu ifade eder.
 
 Cevap:
 """
