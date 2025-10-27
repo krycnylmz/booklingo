@@ -6,3 +6,4 @@ python-dotenv
 tiktoken
 flask
 pypdfium2
+uuid
